@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jarvis</title>
+<meta name="description" content="A personal AI assistant that lives on your home screen.">
+
+<!-- PWA / iOS home-screen behavior -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0B0F17">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Jarvis">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="favicon.png">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <header class="statusbar">
+    <div class="statusbar__left">
+      <span class="dot" id="netDot" aria-hidden="true"></span>
+      <span id="netLabel" class="mono">OFFLINE</span>
+    </div>
+    <div class="statusbar__center mono" id="clock">--:--</div>
+    <button id="settingsBtn" class="iconbtn" aria-label="Settings">
+      <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M19.4 13.5a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V19.5a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H4.5a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1.08 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H10a1.65 1.65 0 0 0 1-1.51V4.5a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V10a1.65 1.65 0 0 0 1.51 1H19.5a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+    </button>
+  </header>
+
+  <main id="stage">
+    <div id="core" class="core" aria-hidden="true">
+      <div class="core__ring core__ring--outer"></div>
+      <div class="core__ring core__ring--inner"></div>
+      <div class="core__bars">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <div class="core__dot"></div>
+    </div>
+    <p id="greeting" class="greeting">Booting up.</p>
+
+    <div id="transcript" class="transcript" role="log" aria-live="polite"></div>
+  </main>
+
+  <div id="quickChips" class="chips">
+    <button class="chip" data-fill="note: ">Note</button>
+    <button class="chip" data-fill="timer for 5 minutes">Timer</button>
+    <button class="chip" data-fill="weather">Weather</button>
+    <button class="chip" data-fill="list notes">My notes</button>
+  </div>
+
+  <form id="inputBar" class="inputbar">
+    <button type="button" id="micHint" class="iconbtn" aria-label="Dictate">
+      <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+    <input id="textInput" class="textinput" type="text" placeholder="Ask Jarvis, or type a command…" autocomplete="off" autocapitalize="sentences" enterkeyhint="send">
+    <button type="submit" id="sendBtn" class="iconbtn iconbtn--accent" aria-label="Send">
+      <svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 12l16-8-6 8 6 8-16-8Z" fill="currentColor"/></svg>
+    </button>
+  </form>
+
+</div>
+
+<!-- Settings sheet -->
+<div id="settingsOverlay" class="overlay" hidden>
+  <div id="settingsSheet" class="sheet" role="dialog" aria-label="Settings">
+    <div class="sheet__handle"></div>
+    <h2 class="sheet__title">Settings</h2>
+
+    <label class="field">
+      <span>Anthropic API key</span>
+      <div class="field__row">
+        <input id="apiKeyInput" type="password" placeholder="sk-ant-…" autocomplete="off" spellcheck="false">
+        <button type="button" id="toggleKeyVisible" class="linkbtn">show</button>
+      </div>
+      <p class="field__hint">Stored only on this device. Get one at <span class="mono">console.anthropic.com</span>.</p>
+    </label>
+
+    <label class="field">
+      <span>Model</span>
+      <select id="modelSelect">
+        <option value="claude-haiku-4-5-20251001">Haiku 4.5 — fastest, cheapest</option>
+        <option value="claude-sonnet-5">Sonnet 5 — balanced</option>
+        <option value="claude-opus-4-8">Opus 4.8 — most capable</option>
+      </select>
+    </label>
+
+    <label class="field">
+      <span>Personality / instructions</span>
+      <textarea id="systemPromptInput" rows="3"></textarea>
+    </label>
+
+    <label class="field">
+      <span>Home city (for weather)</span>
+      <input id="homeCityInput" type="text" placeholder="e.g. Manila, Philippines" autocomplete="off">
+    </label>
+
+    <label class="field field--row">
+      <span>Speak responses aloud</span>
+      <input id="voiceToggle" type="checkbox" checked>
+    </label>
+
+    <div class="sheet__section">
+      <p class="field__hint">
+        Reminders and timers fire while Jarvis is open or recently backgrounded.
+        Full push notifications when the app is completely closed aren't available
+        on this setup — iOS reserves that for apps distributed through the App Store.
+      </p>
+    </div>
+
+    <button type="button" id="clearDataBtn" class="dangerbtn">Erase all data on this device</button>
+    <button type="button" id="closeSettings" class="primarybtn">Done</button>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js" defer></script>
+</body>
+</html>
