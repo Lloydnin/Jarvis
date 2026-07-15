@@ -470,28 +470,39 @@
     return false;
   }
 
-  /* ---------------- Claude API ---------------- */
+/* ---------------- Google AI Studio (Gemini) API ---------------- */
   function buildApiMessages() {
-    return state.chat
-      .filter(function (m) { return m.role === "user" || m.role === "assistant"; })
+    const apiMessages = [
+      { role: "system", content: state.systemPrompt }
+    ];
+
+    const context = state.chat
+      .filter(function (m) { return m.role === "user" || m.role === "assistant" || m.role === "jarvis"; })
       .slice(-20)
-      .map(function (m) { return { role: m.role, content: m.text }; });
+      .map(function (m) {
+        return { 
+          role: m.role === "user" ? "user" : "assistant", 
+          content: m.text 
+        };
+      });
+
+    return apiMessages.concat(context);
   }
 
-  async function callClaude() {
+  async function callGemini() {
     const res = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
       method: "POST",
-    headers: {
-  "content-type": "application/json",
-  "Authorization": "Bearer " + state.apiKey
-},
+      headers: {
+        "content-type": "application/json",
+        "Authorization": "Bearer " + state.apiKey
+      },
       body: JSON.stringify({
         model: state.model,
-        max_tokens: 1024,
-        system: state.systemPrompt,
-        messages: buildApiMessages()
+        messages: buildApiMessages(),
+        temperature: 0.7
       })
     });
+
     if (!res.ok) {
       let message = "Request failed (" + res.status + ")";
       try {
@@ -501,11 +512,8 @@
       throw new Error(message);
     }
     const data = await res.json();
-    const text = (data.content || [])
-      .map(function (b) { return b.text || ""; })
-      .join("")
-      .trim();
-    return text || "(no response)";
+    const text = data.choices[0].message.content;
+    return text ? text.trim() : "(no response)";
   }
 
   /* ---------------- submit handling ---------------- */
@@ -530,7 +538,7 @@
 
     setCoreState("thinking");
     try {
-      const reply = await callClaude();
+      const reply = await callGemini();
       addMessage("jarvis", reply);
       speak(reply);
     } catch (e) {
