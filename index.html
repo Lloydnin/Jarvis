@@ -80,14 +80,16 @@
       <p class="field__hint">Stored only on this device. Get one at <span class="mono">console.anthropic.com</span>.</p>
     </label>
 
-    <label class="field">
+<label class="field">
       <span>Model</span>
       <select id="modelSelect">
-        <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+        <option value="gemini-3.5-flash">Gemini 3.5 Flash (Recommended)</option>
+        <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash-Lite</option>
+        <option value="gemini-2.5-pro">Gemini 2.5 Pro (Standard)</option>
+        <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro (Advanced Reasoning)</option>
       </select>
     </label>
-
-    <label class="field">
+    
       <span>Personality / instructions</span>
       <textarea id="systemPromptInput" rows="3"></textarea>
     </label>
