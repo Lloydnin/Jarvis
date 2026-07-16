@@ -110,4 +110,21 @@ button,
 .iconbtn--accent {
   background: var(--cyan);
   color: var(--bg);
+  /* ---------------- Enhanced Start Logic ---------------- */
+  try {
+    recognition.onstart = () => {
+      document.getElementById('greeting').innerText = "Jarvis is online.";
+      document.getElementById('netLabel').innerText = "ONLINE";
+      document.getElementById('netDot').classList.add('dot--on');
+    };
+    
+    recognition.onerror = (event) => {
+      console.error("Speech Error:", event.error);
+      document.getElementById('greeting').innerText = "Voice error. Tap mic to retry.";
+    };
+
+    recognition.start();
+  } catch (e) {
+    document.getElementById('greeting').innerText = "Click the mic to start.";
+  }
 }
