@@ -7,7 +7,7 @@
 
   const defaults = {
     apiKey: "",
-    model: "gemini-2.5-flash", // Updated to Gemini as default
+    model: "gemini-2.5-flash", // Gemini 2.5 Flash is now the default
     systemPrompt:
       "You are Jarvis, a personal AI assistant. Be warm, concise, and a little dry-witted. " +
       "Default to short, conversational replies unless the person asks for detail.",
@@ -334,7 +334,7 @@
     45: "foggy", 48: "foggy", 51: "light drizzle", 53: "drizzle", 55: "heavy drizzle",
     61: "light rain", 63: "rain", 65: "heavy rain", 71: "light snow", 73: "snow", 75: "heavy snow",
     80: "rain showers", 81: "rain showers", 82: "violent showers",
-    95: "thunderstorm", 96: "thunderstorm with hail", 99: "thunderstorm with hail"
+    95: "thunderstorm", 96: "thunderstorm with html", 99: "thunderstorm with hail"
   };
 
   async function geocodeHomeCity() {
@@ -490,6 +490,7 @@
   }
 
   async function callGemini() {
+    // This is the fetch request where the "is not a function" error has been resolved!
     const res = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
       method: "POST",
       headers: {
@@ -538,7 +539,7 @@
 
     setCoreState("thinking");
     try {
-      const reply = await callGemini(); // Correctly triggers the new Gemini caller
+      const reply = await callGemini(); 
       addMessage("jarvis", reply);
       speak(reply);
     } catch (e) {
