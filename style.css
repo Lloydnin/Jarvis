@@ -91,3 +91,23 @@ select {
   width: 100%; max-height: 88vh; background: var(--bg-panel-2);
   border-radius: 20px 20px 0 0; padding: 10px 20px 24px;
 }
+/* Force custom styles onto all buttons and inputs */
+button, 
+.chip, 
+.iconbtn, 
+.primarybtn, 
+.dangerbtn {
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  /* Ensure the hover/active states are visible */
+  transition: background 0.2s, color 0.2s;
+}
+
+/* Ensure the accent button keeps its color */
+.iconbtn--accent {
+  background: var(--cyan);
+  color: var(--bg);
+}
